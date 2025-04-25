@@ -9,14 +9,14 @@ body{
   display:flex;
   justify-content: center;
   padding:10px;
-  background-image: url("/images/hero.jpg");
+  background-image: url("/hero.jpg");
   background-position: center;
   background-size:cover;
   background-repeat: no-repeat;
   background-position: center;
   flex-wrap: wrap;
   height:100vh;
-  width:100wh;
+  width:100vw;
   position: relative;
 
 }
@@ -55,7 +55,7 @@ nav ul li a{
 }
 
 .links:hover{
-   color:#FFDB58;
+   color:#f39c12;
    border-bottom: 1px solid #ffd700;
   
  
@@ -96,9 +96,10 @@ nav ul li a{
   }
   
   .gallery-title {
-    text-align: center;
+    text-align: left;
     font-size: 2rem;
     margin-bottom: 30px;
+    margin-top: 30px;
     color: #333;
   }
   
@@ -209,6 +210,9 @@ nav ul li a{
     font-size: 1.2rem;
     cursor: pointer;
   }
-  
-  
-  
+
+  .links.active {
+    color: #f39c12; /* Or whatever style you want for active */
+    font-weight: bold;
+    border-bottom: 2px solid #f39c12;
+  }

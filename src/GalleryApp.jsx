@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import ImageList from './components/ImageList';
+import Searchbar from './components/Searchbar';
 import axios from 'axios';
-import Favourites from './components/favourites';
 
-const GalleryApp = () => {
+const GalleryApp = ({favorites, onLike}) => {
   const [images, setImages] = useState([]);
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [favorites, setFavorites] = useState([])
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   const fetchImages = () => {
     setIsLoading(true);
-    axios.get(`http://localhost:3000/images`, {
+    axios.get(`https://photo-gallery-2mcj.onrender.com/images`, {
       params: {
         _page: page,
-        _limit: 29,
+        _limit: 6,
         _sort: 'id',
         _order: 'asc'  
       }
@@ -28,17 +28,7 @@ const GalleryApp = () => {
       console.error('Error fetching images:', err);
       setIsLoading(false);
     });
-  };
-
-  const handleLike = (image) => {
-    setFavorites(prev => {
-      if (prev.find(img => img.id === image.id)) {
-        return prev.filter(img => img.id !== image.id); 
-      } else {
-        return [...prev, image]; 
-      }
-    });
-  };
+  }; 
 
   useEffect(() => {
     fetchImages();
@@ -63,24 +53,29 @@ const GalleryApp = () => {
     setPage(prev => prev + 1);
   };
 
-  useEffect(() => {
-    const savedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    setFavorites(savedFavorites);
-  }, []); 
+  const filteredImages = images.filter(image => {
+    const matchesSearch =
+      image.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      image.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      image.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  useEffect(() => {
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-  }, [favorites]);
- 
-  const handleRemoveFavorite = (image) => {
-    setFavorites(prev => prev.filter(img => img.id !== image.id));
-  };
+    const matchesCategory =
+      selectedCategory === "all" ||
+      image.category?.toLowerCase() === selectedCategory.toLowerCase();
+
+    return matchesSearch && matchesCategory;
+  });
+
 
   return (
     <div className="gallery-container">
-      <Favourites favorites={favorites} onRemove={handleRemoveFavorite}/>
+      <Searchbar
+        onSearch={setSearchTerm}
+        onCategoryChange={setSelectedCategory}
+      />
+
       <h1 className="gallery-title">My Photo Gallery</h1>
-      <ImageList images={images}  onLike={handleLike} />
+      <ImageList images={filteredImages}  onLike={onLike} favorites={favorites} />
       {isLoading && <p>Loading more images...</p>}
       {!isLoading && (
         <button className="load-more-btn" onClick={handleLoadMoreClick}>
